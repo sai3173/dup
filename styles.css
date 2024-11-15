@@ -1,0 +1,47 @@
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f02121fb;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-image: linear-gradient(to bottom right,rgb(255, 166, 0),rgb(231, 58, 87));
+}
+
+.container {
+    text-align: center;
+   
+    padding: 50px;
+    border-radius: 10px;
+}
+
+
+
+#timer {
+    font-size: 8em;
+    margin-bottom: 20px;
+}
+
+button {
+   
+    color: rgb(8, 8, 8);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+      
+}
+
+button:hover {
+    background-color:aliceblue;
+}
+
+button:disabled {
+    background-color: #ccc; /* Gray for disabled state */
+}
+
