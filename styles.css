@@ -26,19 +26,26 @@ body {
     margin-bottom: 20px;
 }
 
+
+
+
+
 button {
-   
     color: rgb(8, 8, 8);
     border: none;
-    padding: 10px 20px;
+    padding: 8px; /* Equal padding for all sides */
     border-radius: 5px;
     font-size: 1em;
     cursor: pointer;
-      
+    width: 100px; /* Fixed width for all buttons */
+    height: 40px; /* Fixed height for all buttons */
+    text-align: center;
+    /* Ensures padding doesn't alter width/height */
 }
 
+
 button:hover {
-    background-color:aliceblue;
+    background-color:rgb(197, 18, 57);
 }
 
 button:disabled {
