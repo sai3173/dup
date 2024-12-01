@@ -2,10 +2,12 @@ let timer;
 let isRunning = false;
 let startTime;
 let timeRemaining = 25 * 60; // Default 25 minutes
-const dingSound = new Audio('ding.mp3'); // Replace with your sound file path
+const dingSound = new Audio('ding.mp3');
 const muteButton = document.getElementById('mute');
 const darkModeButton = document.getElementById('dark-mode');
 let soundEnabled = true;
+let currentMode = "Pomodoro"; // Default mode is Pomodoro
+
 
 // Elements
 const timerDisplay = document.getElementById('timer');
@@ -28,7 +30,7 @@ function updateDisplay() {
     const minutes = Math.floor(timeRemaining / 60);
     const seconds = timeRemaining % 60;
     timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    document.title = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} - Pomodoro Timer`;
+    document.title = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} `;
 }
 
 function playSound() {
@@ -80,21 +82,32 @@ function stopTimer() {
 
 function resetTimer() {
     stopTimer();
-    updateMode(timerLabel.textContent);
+    if (currentMode === "Pomodoro") {
+        timeRemaining = 25 * 60; // Reset to Pomodoro time
+    } else if (currentMode === "Short Break") {
+        timeRemaining = 15 * 60; // Reset to Short Break time
+    } else {
+        const customTime = parseInt(customInput.value);
+        timeRemaining = isNaN(customTime) || customTime <= 0 ? 0 : customTime * 60; // Reset to custom time
+    }
+    updateDisplay(); // Update the display with the reset time
 }
 
+
+
 function updateMode(mode) {
-    timerLabel.textContent = mode;
+    currentMode = mode; // Set the current mode
     if (mode === "Pomodoro") {
-        timeRemaining = 25 * 60;
+        timeRemaining = 25 * 60; // Pomodoro time
     } else if (mode === "Short Break") {
-        timeRemaining = 15 * 60;
+        timeRemaining = 15 * 60; // Short Break time
     } else {
         const customTime = parseInt(customInput.value);
         timeRemaining = isNaN(customTime) || customTime <= 0 ? 0 : customTime * 60;
     }
-    updateDisplay();
+    updateDisplay(); // Update the display to show the correct timer
 }
+
 
 // Disable all timer buttons when the timer is running
 function disableTimerButtons() {
