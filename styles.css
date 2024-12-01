@@ -94,9 +94,12 @@ body.dark-mode {
     #timer {
         font-size: clamp(1.5rem, 4vw, 3rem); /* Adjust timer font size */
     }
-    .modes button:hover{
-        background-color: aliceblue;
+    .modes button:active {
+        background-color: white;
+        color: black;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional pressed effect */
     }
+    
 }
 
 h1 {
