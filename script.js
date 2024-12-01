@@ -1,13 +1,8 @@
 let timer;
 let isRunning = false;
-let startTime;
 let timeRemaining = 25 * 60; // Default 25 minutes
-const dingSound = new Audio('ding.mp3');
-const muteButton = document.getElementById('mute');
-const darkModeButton = document.getElementById('dark-mode');
 let soundEnabled = true;
 let currentMode = "Pomodoro"; // Default mode is Pomodoro
-
 
 // Elements
 const timerDisplay = document.getElementById('timer');
@@ -18,105 +13,129 @@ const pomodoroButton = document.getElementById('pomodoro');
 const shortBreakButton = document.getElementById('short-break');
 const customInput = document.getElementById('custom-time');
 const customButton = document.getElementById('custom');
-const timerLabel = document.getElementById('timer-label');
+const muteButton = document.getElementById('mute');
+const darkModeButton = document.getElementById('dark-mode');
 
 // Ensure notification permissions
-if ("Notification" in window && Notification.permission !== "granted") {
-    Notification.requestPermission();
+if ("Notification" in window) {
+    Notification.requestPermission().then(permission => {
+        if (permission !== "granted") {
+            alert("Notifications are blocked. Please enable them in your browser settings.");
+        }
+    });
 }
 
-// Functions
+// Update Timer Display
 function updateDisplay() {
     const minutes = Math.floor(timeRemaining / 60);
     const seconds = timeRemaining % 60;
     timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    document.title = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} `;
+    document.title = `Timer: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
+// Play Sound
 function playSound() {
-    if (soundEnabled) {
-        const dingSound = document.getElementById('ding-sound');
-        dingSound.currentTime = 0; // Reset the audio
-        dingSound.play().catch(err => {
-            console.error("Audio playback issue:", err);
-        });
+    if (!soundEnabled) return; // Only play sound if enabled
+    const dingSound = document.getElementById('ding-sound');
+    if (dingSound) {
+        dingSound.currentTime = 0; // Reset audio playback
+        dingSound.play().catch(err => console.error("Audio playback issue:", err));
+    } else {
+        console.warn("Sound element not found.");
     }
 }
 
-stopButton.style.display = 'none';
+// Start Timer
 function startTimer() {
     if (!isRunning) {
         playSound(); // Play start sound
         isRunning = true;
-        startTime = Date.now();
-        const endTime = startTime + timeRemaining * 1000;
+        const endTime = Date.now() + timeRemaining * 1000;
 
         timer = setInterval(() => {
-            const now = Date.now();
-            timeRemaining = Math.max(0, Math.round((endTime - now) / 1000));
+            timeRemaining = Math.max(0, Math.round((endTime - Date.now()) / 1000));
             updateDisplay();
 
             if (timeRemaining <= 0) {
                 clearInterval(timer);
                 isRunning = false;
                 playSound(); // Play end sound
-                new Notification("Time's up!", { body: "Your timer is done." });
-                enableTimerButtons(); // Enable all timer buttons when the timer is finished
+
+                // Notification logic
+                handleTimerEnd();
+                enableTimerButtons(); // Re-enable timer buttons
             }
         }, 1000);
 
         startButton.style.display = 'none';
         stopButton.style.display = 'inline-block';
-        disableTimerButtons(); // Disable other timer buttons when the timer is running
+        disableTimerButtons(); // Disable mode buttons while timer is running
     }
 }
 
+// Stop Timer
 function stopTimer() {
     clearInterval(timer);
-    playSound(); // Play start sound
     isRunning = false;
     startButton.style.display = 'inline-block';
     stopButton.style.display = 'none';
-    enableTimerButtons(); // Enable all timer buttons when the timer is stopped
+    enableTimerButtons(); // Re-enable mode buttons
 }
 
+// Reset Timer
 function resetTimer() {
     stopTimer();
-    if (currentMode === "Pomodoro") {
-        timeRemaining = 25 * 60; // Reset to Pomodoro time
-    } else if (currentMode === "Short Break") {
-        timeRemaining = 15 * 60; // Reset to Short Break time
-    } else {
-        const customTime = parseInt(customInput.value);
-        timeRemaining = isNaN(customTime) || customTime <= 0 ? 0 : customTime * 60; // Reset to custom time
-    }
-    updateDisplay(); // Update the display with the reset time
+    setTimeForCurrentMode();
+    updateDisplay();
 }
 
-
-
+// Update Timer Mode
 function updateMode(mode) {
-    currentMode = mode; // Set the current mode
-    if (mode === "Pomodoro") {
-        timeRemaining = 25 * 60; // Pomodoro time
-    } else if (mode === "Short Break") {
-        timeRemaining = 15 * 60; // Short Break time
-    } else {
-        const customTime = parseInt(customInput.value);
-        timeRemaining = isNaN(customTime) || customTime <= 0 ? 0 : customTime * 60;
-    }
-    updateDisplay(); // Update the display to show the correct timer
+    currentMode = mode;
+    setTimeForCurrentMode();
+    updateDisplay();
 }
 
+// Set Time Based on Current Mode
+function setTimeForCurrentMode() {
+    switch (currentMode) {
+        case "Pomodoro":
+            timeRemaining = 25 * 60;
+            break;
+        case "Short Break":
+            timeRemaining = 15 * 60;
+            break;
+        case "Custom":
+            const customTime = parseInt(customInput.value);
+            timeRemaining = isNaN(customTime) || customTime <= 0 ? 0 : customTime * 60;
+            break;
+        default:
+            timeRemaining = 25 * 60; // Default to Pomodoro if mode is unrecognized
+            break;
+    }
+}
 
-// Disable all timer buttons when the timer is running
+// Handle Timer End with Notifications and Alerts
+function handleTimerEnd() {
+    if ("Notification" in window && Notification.permission === "granted") {
+        if (document.visibilityState !== "visible") {
+            new Notification("Time is up!", { body: "" });
+        } else {
+            alert("Time is up!.");
+        }
+    } else {
+        alert("Time is up!.");
+    }
+}
+
+// Disable Timer Buttons
 function disableTimerButtons() {
     pomodoroButton.disabled = true;
     shortBreakButton.disabled = true;
     customButton.disabled = true;
 }
 
-// Enable all timer buttons when the timer is stopped or completed
+// Enable Timer Buttons
 function enableTimerButtons() {
     pomodoroButton.disabled = false;
     shortBreakButton.disabled = false;
@@ -140,5 +159,6 @@ darkModeButton.addEventListener('click', () => {
     document.body.classList.toggle("dark-mode");
 });
 
-// Initial Display
+// Initial Setup
+stopButton.style.display = 'none';
 updateDisplay();
