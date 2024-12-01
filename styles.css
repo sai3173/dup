@@ -81,16 +81,18 @@ body.dark-mode {
 
 }
 @media (max-width: 768px) {
+    .app-bar {
+        flex-direction: column; /* Stack elements for smaller screens */
+        gap: 15px; /* Adjust spacing between elements */
+    }
+
     .container {
-        width: 90%;
-        padding: 5%;
-        font-size: clamp(1rem, 2.5vw, 2rem);
-        min-height: 50vh;
-        height: auto;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
+        padding: 10px; /* Reduce padding for smaller screens */
+        font-size: clamp(0.8rem, 2vw, 1.5rem); /* Slightly smaller font */
+    }
+
+    #timer {
+        font-size: clamp(1.5rem, 4vw, 3rem); /* Adjust timer font size */
     }
 }
 
