@@ -154,7 +154,9 @@ html, body {
     border-radius: 8px;
 }
 
-
+.modes button:hover{
+    background-color: aliceblue;
+}
 #mute:hover {
     background: none; /* Prevent background change on hover */
   }
